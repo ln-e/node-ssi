@@ -28,7 +28,7 @@ Note:
 usage
 ======
 
-    var SSI = require('@ln-e/node-ssi');
+    import { SSI } from '@ln-e/node-ssi';
     var ssi = new SSI({
             baseDir: './html/',
             encoding: 'utf-8',
@@ -50,11 +50,7 @@ usage
 test
 ======
 
-`grunt test`
-
-todo
-======
-better lexer
+`npm run test`
 
 license
 ======

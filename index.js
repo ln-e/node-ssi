@@ -1,27 +1,8 @@
-/**
- * Copyright (C) 2014 yanni4night.com
- * index.js
- *
- * changelog
- * 2014-08-20[11:00:06]:authorized
- * 2014-08-25[14:43:48]:fixed empty output when no tag is resolved
- * 2014-09-23[14:07:07]:fixed line break lost
- * 2014-09-23[14:55:07]:support options absence
- * 2014-11-05[11:49:30]:optimize line-handling
- * 2014-11-22[20:38:07]:remove \r
- *
- * @author yanni4night@gmail.com
- * @version 0.1.5
- * @since 0.1.0
- */
-
-
 "use strict";
 
-var extend = require('extend');
-var fs = require('fs');
-var path = require('path');
-var async = require('async');
+import fs from 'fs';
+import fsPromise from 'fs/promises';
+import path from 'path';
 
 
 var syntaxReg = /<!--#([^\r\n]+?)-->/mg;
@@ -39,8 +20,6 @@ var endifReg = /<!--#\s*endif\s*-->/;
  *
  * @param  {String} tpl Source
  * @return {Function}
- * @since 0.1.0
- * @version 0.1.2
  */
 function resolve(tpl) {
     //resolve set/echo/if
@@ -118,20 +97,9 @@ function resolve(tpl) {
  * SSI is a tool to resolve ssi syntax.
  *
  * @param {Object} initOptions
- * @class
- * @since 0.1.0
- * @version 0.1.0
  */
-var SSI = function(initOptions) {
-    this.options = extend({
-        baseDir: '.',
-        encoding: 'utf-8',
-        payload: {}
-    }, initOptions || {});
-};
-
-SSI.prototype = {
-    regExps: {
+export class SSI {
+    regExps = {
         includeFileReg: includeFileReg,
         setVarReg: setVarReg,
         echoReg: echoReg,
@@ -139,14 +107,22 @@ SSI.prototype = {
         elifReg: elifReg,
         elseReg: elseReg,
         endifReg: endifReg
-    },
+    };
+
+    constructor(initOptions) {
+        this.options = Object.assign({
+            baseDir: '.',
+            encoding: 'utf-8',
+            payload: {}
+        }, initOptions || {});
+    };
+
     /**
-     *
      * @param {Object} config
      */
-    setDefaultOptions: function(options) {
-        return extend(this.options, options || {});
-    },
+    setDefaultOptions (options) {
+        return Object.assign(this.options, options || {});
+    };
     /**
      *
      * <!--# include file="../path/relative/to/current/file" -->
@@ -165,7 +141,7 @@ SSI.prototype = {
      * @param  {Object}   options
      * @param  {Function} callback
      */
-    compile: function(content, options, callback) {
+    compile(content, options, callback) {
         var func;
 
         if (arguments.length < 3) {
@@ -173,90 +149,36 @@ SSI.prototype = {
             options = {};
         }
 
-        options = extend({}, this.options, options || {});
+        options = Object.assign({}, this.options, options || {});
 
-        this.resolveIncludes(content, options, function(err, content) {
-            if(err) {
-                return callback(err);
-            }
-
+        this.resolveIncludes(content, options).then(function(content) {
             func = resolve(content);
             try {
                 return callback(null, func(options.payload || {}));
             } catch (ex) {
                 return callback(ex);
             }
-        });
-    },
-
-    /**
-     * Rsolves all file includes.
-     *
-     * @param content
-     * @param options
-     * @param callback
-     */
-    resolveIncludes: function(content, options, callback) {
-        var matches, seg, isVirtual, basePath, tpath, subOptions, ssi = this;
-
-        async.whilst( // https://www.npmjs.org/package/async#whilst-test-fn-callback-
-            function test(cb) { matches = includeFileReg.exec(content); cb(null, !!matches); },
-            function insertInclude(next) {
-                seg = matches[0];
-                isVirtual = RegExp.$1 == 'virtual';
-                basePath = (isVirtual && options.dirname && RegExp.$3.charAt(0) !== '/')? options.dirname : options.baseDir;
-                tpath = path.join(basePath, RegExp.$3);
-                fs.lstat(tpath,
-                    function(err, stats) {
-                        if (err) {
-                            return next(err);
-                        }
-                        if (stats.isDirectory()) {
-                            tpath = tpath.replace(/(\/)?$/, '/index.html');
-                        }
-                        fs.readFile(tpath, {
-                                encoding: options.encoding
-                            }, function(err, innerContentRaw) {
-                                if (err) {
-                                    return next(err);
-                                }
-                                // ensure that included files can include other files with relative paths
-                                subOptions = extend({}, options, {dirname: path.dirname(tpath)});
-                                ssi.resolveIncludes(innerContentRaw, subOptions, function(err, innerContent) {
-                                    if (err) {
-                                        return next(err);
-                                    }
-                                    content = content.slice(0, matches.index) + innerContent + content.slice(matches.index + seg.length);
-                                    next(null, content);
-                                });
-                            }
-                        );
-                    }
-                );
-
-            },
-            function includesComplete(err) {
-                if (err) {
-                    return callback(err);
-                }
-                return callback(null, content);
+        }, function(err, content) {
+            if(err) {
+                return callback(err);
             }
-        );
-    },
+        });
+    };
+
     /**
      *
      * @param  {String}   filepath
      * @param  {Object}   options
      * @param  {Function} callback
      */
-    compileFile: function(filepath, options, callback) {
+    compileFile(filepath, options, callback) {
 
         if (arguments.length < 3) {
             callback = options;
             options = {};
         }
 
-        options = extend({}, this.options, options || {});
+        options = Object.assign({}, this.options, options || {});
         options.dirname = path.dirname(filepath);
 
         var ssi = this;
@@ -269,6 +191,35 @@ SSI.prototype = {
             } else return ssi.compile(content, options, callback);
         });
     }
-};
 
-module.exports = SSI;
+    /**
+     * Rsolves all file includes.
+     *
+     * @param content
+     * @param options
+     * @returns Promise<string>
+     */
+    async resolveIncludes(content, options) {
+        var matches, seg, isVirtual, basePath, tpath, subOptions, ssi = this;
+
+        matches = includeFileReg.exec(content);
+        while (matches) {
+            seg = matches[0];
+            isVirtual = RegExp.$1 == 'virtual';
+            basePath = (isVirtual && options.dirname && RegExp.$3.charAt(0) !== '/')? options.dirname : options.baseDir;
+            tpath = path.join(basePath, RegExp.$3);
+            const stats = await fsPromise.lstat(tpath);
+            if (stats.isDirectory()) {
+                tpath = tpath.replace(/(\/)?$/, '/index.html');
+            }
+            const innerContentRaw = await fsPromise.readFile(tpath, {encoding: options.encoding});
+            // ensure that included files can include other files with relative paths
+            subOptions = Object.assign({}, options, {dirname: path.dirname(tpath)});
+            const innerContent = await ssi.resolveIncludes(innerContentRaw, subOptions);
+            content = content.slice(0, matches.index) + innerContent + content.slice(matches.index + seg.length);
+            matches = includeFileReg.exec(content);
+        }
+
+        return content;
+    };
+}
