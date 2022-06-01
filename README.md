@@ -1,7 +1,7 @@
-node-ssi
+@ln-e/node-ssi
 ======
 
-[![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency status][david-dm-image]][david-dm-url] [![Build status][appveyor-image]][appveyor-url] [![Built with Grunt][grunt-image]][grunt-url]
+[![NPM version][npm-image]][npm-url]
 
 A server-side-include system for nodejs.
 
@@ -28,7 +28,7 @@ Note:
 usage
 ======
 
-    var SSI = require('node-ssi');
+    var SSI = require('@ln-e/node-ssi');
     var ssi = new SSI({
             baseDir: './html/',
             encoding: 'utf-8',
@@ -52,11 +52,6 @@ test
 
 `grunt test`
 
-changelog
-======
- - 2014-11-03[17:00:51]:support special chars like `\n`,`\v` etc.
- - 2014-12-04[12:39:20]:thanks for @nfriedly,we fixed some bugs and support more features
-
 todo
 ======
 better lexer
@@ -66,19 +61,6 @@ license
 
 MIT
 
-[downloads-image]: http://img.shields.io/npm/dm/node-ssi.svg
-[npm-url]: https://npmjs.org/package/node-ssi
-[npm-image]: http://img.shields.io/npm/v/node-ssi.svg
-
-[travis-url]: https://travis-ci.org/yanni4night/node-ssi
-[travis-image]: http://img.shields.io/travis/yanni4night/node-ssi.svg
-
-[grunt-url]:http://gruntjs.com/
-[grunt-image]: https://cdn.gruntjs.com/builtwith.png
-
-[appveyor-image]:https://ci.appveyor.com/api/projects/status/6sv21grqrixe60yu?svg=true
-[appveyor-url]:https://ci.appveyor.com/project/yanni4night/node-ssi
-
-[david-dm-url]:https://david-dm.org/yanni4night/node-ssi
-[david-dm-image]:https://david-dm.org/yanni4night/node-ssi.svg
-
+[downloads-image]: http://img.shields.io/npm/dm/@ln-e/node-ssi.svg
+[npm-url]: https://npmjs.org/package/@ln-e/node-ssi
+[npm-image]: http://img.shields.io/npm/v/@ln-e/node-ssi.svg

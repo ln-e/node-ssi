@@ -1,6 +1,6 @@
 {
-  "name": "node-ssi",
-  "version": "0.3.2",
+  "name": "@ln-e/node-ssi",
+  "version": "1.0.0",
   "description": "A SSI parser",
   "main": "index.js",
   "scripts": {
@@ -8,17 +8,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yanni4night/node-ssi.git"
+    "url": "https://github.com/ln-e/node-ssi.git"
   },
   "keywords": [
     "ssi"
   ],
-  "author": "yanni4night@gmail.com",
+  "authors": [
+    "yanni4night@gmail.com",
+    "Igor Bodnar"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/yanni4night/node-ssi/issues"
+    "url": "https://github.com/ln-e/node-ssi/issues"
   },
-  "homepage": "https://github.com/yanni4night/node-ssi",
+  "homepage": "https://github.com/ln-e/node-ssi",
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-contrib-jshint": "~0.11.3",
@@ -26,7 +29,7 @@
     "grunt-contrib-watch": "~0.6.1"
   },
   "dependencies": {
-    "async": "~1.4.2",
+    "async": "^3.2.3",
     "extend": "~3.0.0"
   }
 }

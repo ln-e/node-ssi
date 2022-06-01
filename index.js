@@ -200,7 +200,7 @@ SSI.prototype = {
         var matches, seg, isVirtual, basePath, tpath, subOptions, ssi = this;
 
         async.whilst( // https://www.npmjs.org/package/async#whilst-test-fn-callback-
-            function test() {return !!(matches = includeFileReg.exec(content)); },
+            function test(cb) { matches = includeFileReg.exec(content); cb(null, !!matches); },
             function insertInclude(next) {
                 seg = matches[0];
                 isVirtual = RegExp.$1 == 'virtual';
